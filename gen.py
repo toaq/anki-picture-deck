@@ -1,14 +1,17 @@
 import os
+import genanki
 
-def make_entry_for_word(media, word):
-    entry = word + "; "
+# Create the note for a single word.
+
+def make_note_for_word(media_list, model, word):
+    image_names = ""
     next_image_id = 1
 
     while True:
         next_image_name_template = word + str(next_image_id)
         next_image_name_candidates = []
 
-        for image in media:
+        for image in media_list:
             if (next_image_name_template + ".") in image:
                 next_image_name_candidates.append(image)
 
@@ -20,24 +23,57 @@ def make_entry_for_word(media, word):
 
         next_image_name = next_image_name_candidates[0]
         
-        media.remove(next_image_name)
-        entry += "<img src=\"" + next_image_name + "\">"
+        media_list.remove(next_image_name)
+        image_names += "<img src=\"" + next_image_name + "\">"
         next_image_id += 1
 
     if next_image_id == 1: # No images found
-        return media, None
+        return media_list, None
 
-    return media, entry
+    return media_list, genanki.Note(model=model, fields=[word, image_names])
 
+
+# Create the model of the deck.
+
+model = genanki.Model(
+        2083704285,     # Randomly-generated ID for this deck
+        "Toaq cards model",
+        fields = [
+            {"name": "Predicate"},
+            {"name": "Images"}
+        ],
+        templates = [
+            {
+                "name": "Card 1 (Images -> Predicate)",
+                "qfmt": "{{Images}}",
+                "afmt": "{{Predicate}}<hr>{{Images}}"
+            }
+        ])
+
+
+# Create the deck.
+
+deck = genanki.Deck(1510915964, "Toaq cards deck")
+
+
+# Create the notes.
 
 media = os.listdir("media/")
 
 with open("freq.txt") as freq:
-    with open("toaq_deck.txt", "w") as output:
-        for line in freq:
-            word = line.split(" ")[1]
-            media, entry = make_entry_for_word(media, word)
+    for line in freq:
+        word = line.split(" ")[1]
+        media, note = make_note_for_word(media, model, word)
 
-            if entry != None:
-                print(entry, file=output)
+        if note != None:
+            deck.add_note(note)
+
+
+# Create the package.
+
+package = genanki.Package(deck)
+
+# Write the package out.
+
+package.write_to_file("toaq.apkg")
 
