@@ -1,6 +1,6 @@
 import os
 
-def make_entry_for_word(content, word):
+def make_entry_for_word(media, word):
     entry = word + "; "
     next_image_id = 1
 
@@ -8,7 +8,7 @@ def make_entry_for_word(content, word):
         next_image_name_template = word + str(next_image_id)
         next_image_name_candidates = []
 
-        for image in content:
+        for image in media:
             if (next_image_name_template + ".") in image:
                 next_image_name_candidates.append(image)
 
@@ -20,23 +20,23 @@ def make_entry_for_word(content, word):
 
         next_image_name = next_image_name_candidates[0]
         
-        content.remove(next_image_name)
+        media.remove(next_image_name)
         entry += "<img src=\"" + next_image_name + "\">"
         next_image_id += 1
 
     if next_image_id == 1: # No images found
-        return content, None
+        return media, None
 
-    return content, entry
+    return media, entry
 
 
-content = os.listdir("content/")
+media = os.listdir("media/")
 
 with open("freq.txt") as freq:
     with open("toaq_deck.txt", "w") as output:
         for line in freq:
             word = line.split(" ")[1]
-            content, entry = make_entry_for_word(content, word)
+            media, entry = make_entry_for_word(media, word)
 
             if entry != None:
                 print(entry, file=output)
