@@ -48,7 +48,9 @@ model = genanki.Model(
                 "qfmt": "{{Images}}",
                 "afmt": "{{Predicate}}<hr>{{Images}}"
             }
-        ])
+        ],
+        css = (".card {text-align: center; font-size: 40px; font-weight: bold} img {max-width: 250px; max-height: 250px}")
+        )
 
 
 # Create the deck.
@@ -69,9 +71,20 @@ with open("freq.txt") as freq:
             deck.add_note(note)
 
 
+if media != []:
+    print("Remaining media files not incorporated into deck:", media)
+
+
 # Create the package.
 
 package = genanki.Package(deck)
+
+
+# Add the images to the package.
+
+media = list(map(lambda x: "media/" + x, os.listdir("media/")))
+package.media_files = media
+
 
 # Write the package out.
 
