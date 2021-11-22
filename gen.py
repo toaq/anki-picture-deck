@@ -70,7 +70,6 @@ with open("freq.txt") as freq:
         if note != None:
             deck.add_note(note)
 
-
 if media != []:
     print("Remaining media files not incorporated into deck:", media)
 
